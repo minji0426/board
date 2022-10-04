@@ -1,0 +1,91 @@
+    <select id="getAllReply" resultType="java.util.HashMap">
+    	select	id as "id"
+    		,	parent_reply_id as "parent_reply_id"
+    		,	reply_id as "reply_id"
+    		,	r_writer as "r_writer"
+    		,	r_content as "r_content"
+    		,	inst_date as "inst_date"
+    		,	del_yn as "del_yn"
+    	from(
+    		WITH CTE AS (
+				SELECT	id as "id"
+    				,	parent_reply_id as "parent_reply_id"
+    				,	reply_id as "reply_id"
+    				,	r_writer as "r_writer"
+    				,	r_content as "r_content"
+    				,	inst_date as "inst_date"
+    				,	del_yn as "del_yn"
+			<!-- 		,convert(VARCHAR(255), reply_id) sort -->
+				FROM reply
+				WHERE parent_reply_id is null
+	
+			UNION ALL 
+
+				SELECT 	B.id as "id"
+    				,	B.parent_reply_id as "parent_reply_id"
+    				,	B.reply_id as "reply_id"
+    				,	B.r_writer as "r_writer"
+    				,	B.r_content as "r_content"
+    				,	B.inst_date as "inst_date"
+    				,	B.del_yn as "del_yn"
+		<!-- 			,convert(VARCHAR(255), convert(NVARCHAR, A.reply_id) 
+						+ '>' + convert(VARCHAR(255), B.reply_id)) sort -->
+				FROM CTE as "A"
+				JOIN reply as "B" ON B.parent_reply_id = A.reply_id
+			) select * from CTE
+<!-- 			order by sort -->
+				
+		) reply_list
+    	where	id = #{id}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+    <select id="getAllReply" resultType="java.util.HashMap">
+    	select	"id" as "id"
+    		,	"parent_reply_id" as "parent_reply_id"
+    		,	"reply_id" as "reply_id"
+    		,	"r_writer" as "r_writer"
+    		,	"r_content" as "r_content"
+    		,	"inst_date" as "inst_date"
+    		,	"del_yn" as "del_yn"
+    	from(
+    		WITH CTE AS (
+				SELECT	id as "id"
+    				,	parent_reply_id as "parent_reply_id"
+    				,	reply_id as "reply_id"
+    				,	r_writer as "r_writer"
+    				,	r_content as "r_content"
+    				,	inst_date as "inst_date"
+    				,	del_yn as "del_yn"
+			<!-- 		,convert(VARCHAR(255), reply_id) sort -->
+				FROM reply
+				WHERE parent_reply_id is null
+	
+			UNION ALL 
+
+				SELECT 	B.id as "id"
+    				,	B.parent_reply_id as "parent_reply_id"
+    				,	B.reply_id as "reply_id"
+    				,	B.r_writer as "r_writer"
+    				,	B.r_content as "r_content"
+    				,	B.inst_date as "inst_date"
+    				,	B.del_yn as "del_yn"
+		<!-- 			,convert(VARCHAR(255), convert(NVARCHAR, A.reply_id) 
+						+ '>' + convert(VARCHAR(255), B.reply_id)) sort -->
+				FROM CTE
+				JOIN reply B ON B.parent_reply_id = reply_id
+			) select * from CTE
+<!-- 			order by sort -->
+				
+		) reply_list
+    	where	"id" = #{id}
+    </select>

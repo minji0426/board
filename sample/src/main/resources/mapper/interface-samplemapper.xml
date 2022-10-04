@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.repository.BoardMapper">
+    <insert id="add" parameterType="java.util.HashMap" >
+    	
+    	insert into board (
+    		title,
+    		writer,
+    		content,
+    		inst_date
+    	) values (
+    		#{title}, 
+    		#{writer}, 
+    		#{content},
+    		now()
+    	)
+    	<selectKey keyColumn="id" keyProperty="id"  resultType="int" order="AFTER">
+    		select LAST_INSERT_ID() as "id"
+    	</selectKey>
+    	
+    </insert>
+    
+    <insert id="fileUpload">
+    	insert into file (
+    		board_id,
+    		org_file_name,
+    		reg_date
+    	) values (
+    		#{board_id},
+    		#{org_file_name},
+    		now()
+    	)
+    </insert>
+    
+    <select id="getFile" resultType="java.util.HashMap" >
+        select  board_id as "board_id"
+        	,	org_file_name as "org_file_name"
+        	,	file_no as "file_no"
+        from 	file
+        where board_id = #{id} and del_yn = 'N'
+    </select>
+    
+    <select id="getFileByFileNo" resultType="java.util.HashMap" >
+        select  board_id as "board_id"
+        	,	org_file_name as "org_file_name"
+        	,	file_no as "file_no"
+        from 	file
+        where file_no = #{file_no} and del_yn = 'N'
+    </select>
+    
+    <update id="deleteFile">
+        update  file
+        set     
+        	del_yn = 'Y'         
+        where   file_no = #{file_no}
+    </update>
+    
+    <insert id="test">
+    	insert into board (
+    		title,
+    		writer,
+    		content,
+    		inst_date
+    	) select title, writer, content, inst_date from board
+    </insert>
+    
+    <update id="edit">
+        update  board
+        set     
+        	title = #{title},
+            content = #{content}          
+        where   id = #{id}
+    </update>
+    
+    <update id="delete">
+        update  board
+        set     
+        	del_yn = 'Y'         
+        where   id = #{id}
+    </update>
+    
+    <update id="viewCount">
+    	update  board
+        set     
+        	views = views + 1
+        where   id = #{id}
+    </update>
+    
+    <select id="getBoardAll" resultType="java.util.HashMap" >
+        select  id as "id"
+        	,	title as "title"
+        	,	writer as "writer"
+        	,	inst_date as "inst_date"
+        	,	views as "views"
+        	,	content as "content"
+        	,	del_yn as "del_yn"
+        from	board
+        where	del_yn = 'N'
+        order by ID DESC
+    </select>
+    
+    <select id="getBoardById" resultType="java.util.HashMap" >
+        select  id as "id"
+        	,	title as "title"
+        	,	writer as "writer"
+        	,	inst_date as "inst_date"
+        	,	views as "views"
+        	,	content as "content"
+        from 	board
+        where id = #{id}
+        order by ID DESC
+    </select>
+
+	<select id="getBoardByKeyword" resultType="java.util.HashMap">
+        select  id as "id"
+        	,	title as "title"
+        	,	writer as "writer"
+        	,	inst_date as "inst_date"
+        	,	views as "views"
+        	,	content as "content"
+        	,	del_yn as "del_yn"
+        from	board
+        where	del_yn = 'N'
+        <choose>
+        	<when test="searchType == 'title'">
+        		AND title LIKE '%'||#{keyword}||'%'
+        	</when>
+        	<when test="searchType == 'content'">
+        		AND content LIKE '%'||#{keyword}||'%'
+        	</when>
+        	<when test="searchType == 'writer'">
+        		AND writer LIKE '%'||#{keyword}||'%'
+        	</when>
+        </choose>
+        order by ID DESC
+        limit #{postStart}, #{postNum}
+    </select>
+    
+    <select id="boardCount"  resultType="int" >
+        select  count(*)
+        from 	board
+        where	del_yn = 'N'
+        <choose>
+        	<when test="searchType == 'title'">
+        		AND title LIKE '%'||#{keyword}||'%'
+        	</when>
+        	<when test="searchType == 'content'">
+        		AND content LIKE '%'||#{keyword}||'%'
+        	</when>
+        	<when test="searchType == 'writer'">
+        		AND writer LIKE '%'||#{keyword}||'%'
+        	</when>
+        </choose>
+    </select>
+    
+    <select id="replyCount" resultType="int" >
+        select  count(*)
+        from 	reply
+        where	del_yn = 'N' and id = #{id} and parent_reply_id is null
+    </select>
+    
+    <select id="getReply" resultType="java.util.HashMap">
+    	select	id as "id"
+    		,	parent_reply_id as "parent_reply_id"
+    		,	reply_id as "reply_id"
+    		,	r_writer as "r_writer"
+    		,	r_content as "r_content"
+    		,	inst_date as "inst_date"
+    		,	del_yn as "del_yn"
+    	from	reply
+    	where	id = #{id} and parent_reply_id is null
+    </select>
+    
+    <select id="getReReply" resultType="java.util.HashMap">
+    	select	id as "id"
+    		,	parent_reply_id as "parent_reply_id"
+    		,	reply_id as "reply_id"
+    		,	r_writer as "r_writer"
+    		,	r_content as "r_content"
+    		,	inst_date as "inst_date"
+    		,	del_yn as "del_yn"
+    	from	reply
+    	where	id = #{id} and parent_reply_id is not null
+    </select>
+    
+    <select id="getAllReply" resultType="java.util.HashMap">
+    	WITH CTE (id, parent_reply_id
+				,reply_id
+				,r_writer
+				,r_content
+				,inst_date
+				,del_yn 
+				,sort
+				)
+				
+		AS (
+			SELECT	id
+				,parent_reply_id
+				,reply_id
+				,r_writer
+				,r_content
+				,inst_date
+				,del_yn
+				,convert(VARCHAR(255), reply_id) sort
+			FROM reply
+			WHERE parent_reply_id IS NULL
+	
+			UNION ALL
+	
+			SELECT B.id
+				,B.parent_reply_id
+				,B.reply_id
+				,B.r_writer
+				,B.r_content
+				,B.inst_date
+				,B.del_yn
+				,convert(VARCHAR(255), convert(NVARCHAR, A.reply_id) + '>' + convert(VARCHAR(255), B.reply_id)) sort
+			FROM CTE as A
+			join reply as B on B.parent_reply_id = A.reply_id 
+			
+			)
+		SELECT id AS "id"
+			,parent_reply_id AS "parent_reply_id"
+			,reply_id AS "reply_id"
+			,r_writer AS "r_writer"
+			,r_content AS "r_content"
+			,inst_date AS "inst_date"
+			,del_yn AS "del_yn"
+		FROM CTE
+		WHERE id = #{id}
+		ORDER BY sort
+    </select>
+    
+    <insert id="addReply">
+    	insert into reply (
+    		id,
+    		r_writer,
+    		r_content,
+    		parent_reply_id,
+    		inst_date
+    	) values (
+    		#{id}, 
+    		#{writer},
+    		#{content},
+    		#{parentReplyId},
+    		now()
+    	)
+    </insert>
+</mapper>

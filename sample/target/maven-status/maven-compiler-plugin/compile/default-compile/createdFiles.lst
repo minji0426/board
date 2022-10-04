@@ -1,0 +1,6 @@
+com\example\demo\DemoApplication.class
+com\example\demo\repository\BoardRepository.class
+com\example\demo\service\BoardService.class
+com\example\demo\controller\BoardController.class
+com\example\demo\config\MybatisConfiguration.class
+com\example\demo\repository\BoardMapper.class

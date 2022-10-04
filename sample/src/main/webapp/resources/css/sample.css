@@ -1,0 +1,57 @@
+#wrap {
+    width: 1000px;
+	margin:auto;
+}
+#reply {
+	text-align: center;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+    line-height: 24px;
+}
+table td,th {
+    border-top:1px solid black;
+    border-bottom:1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+    padding: 10px;
+}
+th {
+	background: MistyRose;
+}
+a{
+    text-decoration: none;
+    color: black;
+}
+.saw {
+    		color:gray;
+    	}
+a:hover{
+    color: gray;
+}
+.btn{
+	margin-top: 15px;
+	width: 120px;
+	height: 35px;
+	font-size: 17px;
+	background-color: Seashell;
+	box-shadow : 3px 3px 3px gray;
+	transition-duration: 0.3s;
+	border: 0;
+	outline: 0;
+}
+.btn:active{
+	margin-left: 5px;
+	margin-top : 5px;
+	box-shadow : none;
+}
+input{
+	border:0 solid black;
+	outline: none;
+}
+textarea{
+	border:0 solid black;
+	outline: none;
+}

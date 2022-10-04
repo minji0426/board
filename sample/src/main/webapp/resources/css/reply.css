@@ -1,0 +1,27 @@
+#reply {
+	width: 100%;
+	margin:auto;
+}
+
+#replyCount {
+	magin-bottom: 10px;
+}
+
+#replyInput {
+	width: 50%;
+	height: 3.3em;
+	outline: 0.5;
+}
+
+#btnReplySubmit, #btnReplyReplySubmit, #btnReplyReply{
+	background-color: Seashell;
+	box-shadow : 3px 3px 3px gray;
+	transition-duration: 0.3s;
+	border: 0;
+	outline: 0;
+	
+    width: 5.5em;
+    height: 30px;;
+    font-size: 15px;
+    font-weight: bold;
+}

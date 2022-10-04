@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.repository.BoardDomainMapper">
+   
+    <update id="editBoard">
+        update  board
+        set     
+        	title = #{title},
+            content = #{content},
+            del_yn = #{delYn}, 
+            views = #{views}          
+        where   id = #{id}
+    </update>
+   
+
+    <select id="getBoardById" resultType="domain.Board" >
+        select  id as "id"
+        	,	title as "title"
+        	,	writer as "writer"
+        	,	inst_date as "inst_date"
+        	,	views as "views"
+        	,	content as "content"
+        	,	del_yn as "delYn" 
+        from 	board
+        where id = #{id}        
+    </select>
+    
+    <insert id="addReply">
+    	insert into reply (
+    		id,
+    		r_writer,
+    		r_content,
+    		parent_reply_id,
+    		inst_date
+    	) values (
+    		#{id}, 
+    		#{writer},
+    		#{content},
+    		#{parentReplyId},
+    		now()
+    	)
+    </insert>
+
+	<select id="getAllReply" resultType="domain.Reply">
+    	WITH CTE (id, parent_reply_id
+				,reply_id
+				,r_writer
+				,r_content
+				,inst_date
+				,del_yn 
+				,sort
+				)
+				
+		AS (
+			SELECT	id
+				,parent_reply_id
+				,reply_id
+				,r_writer
+				,r_content
+				,inst_date
+				,del_yn
+				,convert(VARCHAR(255), reply_id) sort
+			FROM reply
+			WHERE parent_reply_id IS NULL
+	
+			UNION ALL
+	
+			SELECT B.id
+				,B.parent_reply_id
+				,B.reply_id
+				,B.r_writer
+				,B.r_content
+				,B.inst_date
+				,B.del_yn
+				,convert(VARCHAR(255), convert(NVARCHAR, A.reply_id) + '>' + convert(VARCHAR(255), B.reply_id)) sort
+			FROM CTE as A
+			join reply as B on B.parent_reply_id = A.reply_id 
+			
+			)
+		SELECT id AS "id"
+			,parent_reply_id AS "parentReplyId"
+			,reply_id AS "replyId"
+			,r_writer AS "writer"
+			,r_content AS "content"
+			,inst_date AS "inst_date"
+			,del_yn AS "delYn"
+		FROM CTE
+		WHERE id = #{id}
+		ORDER BY sort
+    </select>
+	
+	<select id="getFile" resultType="java.util.HashMap" >
+        select  board_id as "board_id"
+        	,	org_file_name as "org_file_name"
+        	,	file_no as "file_no"
+        from 	file
+        where board_id = #{id} and del_yn = 'N'
+    </select>
+	
+</mapper>
